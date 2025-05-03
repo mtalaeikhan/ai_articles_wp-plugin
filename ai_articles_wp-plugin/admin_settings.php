@@ -21,20 +21,6 @@ function ai_articles_wp_settings_page() {
         return;
     }
 
-    // Save settings if the form is submitted
-    if (isset($_POST['ai_articles_wp_save_settings'])) {
-        // Sanitize and save settings
-        update_option('ai_articles_wp_settings', [
-            'default_language' => sanitize_text_field($_POST['default_language']),
-            'target_language' => sanitize_text_field($_POST['target_language']),
-            'enable_seo' => isset($_POST['enable_seo']) ? 1 : 0,
-            'api_key' => sanitize_text_field($_POST['api_key']),
-        ]);
-
-        // Display an admin notice
-        echo '<div class="updated"><p>Settings saved successfully.</p></div>';
-    }
-
     // Retrieve current settings
     $settings = get_option('ai_articles_wp_settings', [
         'default_language' => 'en',
@@ -47,46 +33,58 @@ function ai_articles_wp_settings_page() {
     ?>
     <div class="wrap">
         <h1>AI Articles WP Plugin Settings</h1>
-        <form method="post" action="">
-            <table class="form-table">
+
+        <!-- Add New Article Button -->
+        <button id="open-modal" class="button button-primary">Add New Article</button>
+
+        <!-- Modal for Adding New Article -->
+        <div id="article-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Add New Article</h2>
+                <form id="new-article-form">
+                    <label for="article-url">Article URL:</label>
+                    <input type="url" id="article-url" name="article-url" class="regular-text" required>
+                    
+                    <label for="language">Target Language:</label>
+                    <input type="text" id="language" name="language" value="<?php echo esc_attr($settings['target_language']); ?>" class="regular-text" required>
+
+                    <button type="submit" class="button button-primary">Generate Article</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- List of Generated Articles -->
+        <h2>Generated Articles</h2>
+        <table class="widefat fixed" id="articles-table">
+            <thead>
                 <tr>
-                    <th scope="row"><label for="default_language">Default Language</label></th>
-                    <td>
-                        <input type="text" name="default_language" id="default_language" 
-                               value="<?php echo esc_attr($settings['default_language']); ?>" 
-                               class="regular-text">
-                        <p class="description">Enter the default language of the articles (e.g., en for English).</p>
-                    </td>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>SEO</th>
+                    <th>Post Link</th>
                 </tr>
-                <tr>
-                    <th scope="row"><label for="target_language">Target Language</label></th>
-                    <td>
-                        <input type="text" name="target_language" id="target_language" 
-                               value="<?php echo esc_attr($settings['target_language']); ?>" 
-                               class="regular-text">
-                        <p class="description">Enter the target language for translation (e.g., fa for Farsi).</p>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row"><label for="enable_seo">Enable SEO Optimization</label></th>
-                    <td>
-                        <input type="checkbox" name="enable_seo" id="enable_seo" 
-                               value="1" <?php checked($settings['enable_seo'], 1); ?>>
-                        <label for="enable_seo">Enable integration with Yoast SEO or basic SEO optimization.</label>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row"><label for="api_key">API Key</label></th>
-                    <td>
-                        <input type="text" name="api_key" id="api_key" 
-                               value="<?php echo esc_attr($settings['api_key']); ?>" 
-                               class="regular-text">
-                        <p class="description">Enter your API key for the Hugging Face translation service.</p>
-                    </td>
-                </tr>
-            </table>
-            <?php submit_button('Save Settings', 'primary', 'ai_articles_wp_save_settings'); ?>
-        </form>
+            </thead>
+            <tbody>
+                <?php
+                // Fetch generated articles (placeholder data for now)
+                $articles = get_option('ai_articles_wp_generated', []); // Replace with your actual database logic
+
+                if (!empty($articles)) {
+                    foreach ($articles as $article) {
+                        echo '<tr>';
+                        echo '<td>' . esc_html($article['title']) . '</td>';
+                        echo '<td>' . esc_html($article['status']) . '</td>';
+                        echo '<td>' . esc_html($article['seo']) . '</td>';
+                        echo '<td><a href="' . esc_url($article['post_link']) . '" target="_blank">View Post</a></td>';
+                        echo '</tr>';
+                    }
+                } else {
+                    echo '<tr><td colspan="4">No articles generated yet.</td></tr>';
+                }
+                ?>
+            </tbody>
+        </table>
     </div>
     <?php
 }
