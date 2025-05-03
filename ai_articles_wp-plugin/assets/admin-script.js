@@ -14,4 +14,26 @@ jQuery(document).ready(function ($) {
     }).on('blur', function () {
         $(this).css('box-shadow', 'none');
     });
+        // Open modal
+    $('#open-modal').on('click', function () {
+        $('#article-modal').fadeIn(300);
+    });
+
+    // Close modal
+    $('.close').on('click', function () {
+        $('#article-modal').fadeOut(300);
+    });
+
+    // Handle form submission
+    $('#new-article-form').on('submit', function (e) {
+        e.preventDefault();
+        const articleUrl = $('#article-url').val();
+        const targetLanguage = $('#language').val();
+
+        // Show loading spinner or custom message
+        alert('Generating article from: ' + articleUrl + ', Language: ' + targetLanguage);
+
+        // Add your AJAX handling here to process the article
+        $('#article-modal').fadeOut(300);
+    });
 });
